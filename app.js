@@ -1,8 +1,8 @@
 const express = require('express');
 const app = express();
-const ejs = require('ejs');
 const mongoose = require('mongoose');
 const Listing = require("./models/listing.js")
+const path = require('path');
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/gigeconomy";
 
@@ -17,23 +17,14 @@ async function main(){
     await mongoose.connect(MONGO_URL);
 }
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-// app.get('/testListing', async (req, res) => {
-//     let sampleListing = new Listing({
-//         title: "My Home",
-//         description: "Best Home",
-//         price: 5000,
-//         location: "Mandawa",
-//         country: "India"
-//     })
-
-//     await sampleListing.save();
-//     console.log("Sample listing");
-//     res.send("successful");
-// })
+//index route
+app.get('/listings', async (req, res) => {
+    const allListings = await Listing.find({});
+    res.render("listings/index.ejs", {allListings});
+})
 
 app.listen(8080, () => {
   console.log('Server is running on port 8080');
