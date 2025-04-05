@@ -28,6 +28,7 @@ router
     .get(wrapAsync(listingController.showListing))
     .put(
         isOwner,
+        upload.single("listing[image]"),
         validateListing,
         wrapAsync(listingController.updateListing)
     )
