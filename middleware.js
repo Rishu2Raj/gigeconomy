@@ -1,24 +1,28 @@
 const Listing = require("./models/listing.js");
 const Review = require("./models/review.js");
+const ExpressError = require("./utils/ExpressError.js");
 const {listingSchema, reviewSchema} = require("./schema.js");
 
 module.exports.isLoggedIn = (req, res, next) => {
-    if(!req.isAuthenticated()){
+    if(!req.isAuthenticated()){ //method to check user is logged in or not
         req.session.redirectUrl = req.originalUrl;
         req.flash("error", "You must be logged in to create listing!");
         return res.redirect("/login")
     }
+
     next();
-}
+};
 
-
+//to save redirect url
 module.exports.saveRedirectUrl = (req, res, next) => {
     if (req.session.redirectUrl) {
         res.locals.redirectUrl = req.session.redirectUrl;
     }
     next();
-}
+};
 
+//if the listing owner is not equal to current owner
+//so dont provide permission to edit & delete and other routes
 module.exports.isOwner = async (req, res, next) => {
     let {id} = req.params;
     let listing = await Listing.findById(id);
@@ -27,25 +31,29 @@ module.exports.isOwner = async (req, res, next) => {
         return res.redirect(`/listings/${id}`);
     }
     next();
-}
+};
 
+//listing schema validation
 module.exports.validateListing = (req, res, next) => {
     let {error} = listingSchema.validate(req.body);
     if(error){
         let errMsg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(400, errMsg);
     } else {
         next();
     }
-}
+};
 
+//listing review validation
 module.exports.validateReview = (req, res, next) => {
     let {error} = reviewSchema.validate(req.body);
     if(error){
         let errMsg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(400, errMsg);
     } else {
         next();
     }
-}
+};
 
 module.exports.isReviewAuthor = async (req, res, next) => {
     let {id, reviewId} = req.params;
@@ -55,4 +63,4 @@ module.exports.isReviewAuthor = async (req, res, next) => {
         return res.redirect(`/listings/${id}`);
     }
     next();
-}
+};
