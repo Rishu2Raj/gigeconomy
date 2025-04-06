@@ -1,4 +1,5 @@
 const Listing = require("../models/listing.js");
+const axios = require("axios");
 
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
@@ -20,15 +21,47 @@ module.exports.showListing = async (req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
-    let url = req.file.path;
-    let filename = req.file.filename;
-
-    const newListing = new Listing( req.body.listing);
-    newListing.owner = req.user._id;
-    newListing.image = { url, filename };
-    await newListing.save();
-    res.redirect("/listings");
-};
+    try {
+      let url = req.file.path;
+      let filename = req.file.filename;
+  
+      const maptilerApiKey = process.env.MAP_TOKEN;
+      const locationQuery = req.body.listing.location;
+  
+      // Geocode location using MapTiler API
+      const geoResponse = await axios.get(`https://api.maptiler.com/geocoding/${encodeURIComponent(locationQuery)}.json`, {
+        params: {
+          key: maptilerApiKey,
+          limit: 1,
+        },
+      });
+  
+      const geoData = geoResponse.data;
+  
+      if (!geoData || !geoData.features || geoData.features.length === 0) {
+        req.flash("error", "Location not found.");
+        return res.redirect("/listings/new");
+      }
+  
+      const coordinates = geoData.features[0].geometry.coordinates; // [lng, lat]
+  
+      const newListing = new Listing(req.body.listing);
+      newListing.owner = req.user._id;
+      newListing.image = { url, filename };
+      newListing.geometry = {
+        type: "Point",
+        coordinates: coordinates,
+      };
+  
+      await newListing.save();
+      req.flash("success", "New listing created!");
+      res.redirect("/listings");
+    } catch (err) {
+      console.error("Error in createListing:", err);
+      req.flash("error", "Something went wrong while creating the listing.");
+      res.redirect("/listings/new");
+    }
+  };
 
 module.exports.renderEditForm = async (req, res) => {
     let {id} = req.params;
