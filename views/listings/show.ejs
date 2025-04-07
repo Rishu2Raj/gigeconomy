@@ -18,6 +18,8 @@
                 <p><%= listing.country %></p>
             </p>
         </div>
+                <button id="rzp-btn" type="button" class="btn btn-success"><b>Book Now ₹<%= listing.price %></b></button>
+            
     </div>
     <br>
     <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
@@ -69,9 +71,11 @@
                             <p class="card-text"><%= review.comment %></p>
                             <p class="starability-result" data-rating="<%= review.rating %>"></p>
                         </div>
-                        <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-                            <button type="submit" class="btn btn-sm btn-dark">Delete</button>
-                        </form>
+                        <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
+                            <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                                <button type="submit" class="btn btn-sm btn-dark">Delete</button>
+                            </form>
+                        <% } %>
                     </div>
                 <% } %>
             </div>
@@ -84,3 +88,57 @@
 </div>
 
 <script src="/js/map.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const button = document.getElementById('rzp-btn');
+    button.addEventListener('click', async () => {
+        console.log("Book Now button clicked!"); // 👈 debug line
+        try {
+            const res = await axios.post(`/bookings/order/<%= listing._id %>`);
+            const data = res.data;
+            
+            const options = {
+                key: data.key_id,
+                amount: data.amount,
+                currency: data.currency,
+          name: data.listing.title,
+          description: data.listing.description,
+          order_id: data.order_id,
+          handler: async function (response) {
+              try {
+                  const verifyRes = await axios.post('/bookings/verify', {
+                      razorpay_order_id: response.razorpay_order_id,
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_signature: response.razorpay_signature,
+                    });
+                    
+                    if (verifyRes.data.success) {
+                        window.location.href = '/bookings/success';
+                    } else {
+                        window.location.href = '/bookings/failure';
+                    }
+                } catch (error) {
+                    console.error("Verification failed", error);
+                    window.location.href = '/bookings/failure';
+                }
+            },
+            prefill: {
+                name: "<%= currUser ? currUser.username : '' %>",
+                email: "<%= currUser ? currUser.email : '' %>"
+            },
+            theme: {
+                color: "#3399cc"
+            }
+        };
+        
+        const rzp = new Razorpay(options);
+        rzp.open();
+    } catch (error) {
+        console.error("Error creating order", error);
+        alert("Error initiating payment.");
+    }
+});
+</script>
