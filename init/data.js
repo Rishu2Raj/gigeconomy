@@ -9,6 +9,7 @@ const sampleListings = [
     price: 850,
     location: "Colaba, Mumbai",
     country: "India",
+    category: "beach",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -25,6 +26,7 @@ const sampleListings = [
     price: 2500,
     location: "Calangute, Goa",
     country: "India",
+    category: "beach",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -41,6 +43,7 @@ const sampleListings = [
     price: 4500,
     location: "Khar, Mumbai",
     country: "India",
+    category: "farms",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -57,6 +60,7 @@ const sampleListings = [
     price: 1900,
     location: "Manali, Himachal Pradesh",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -73,6 +77,7 @@ const sampleListings = [
     price: 3200,
     location: "Jaipur, Rajasthan",
     country: "India",
+    category: "pools",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -89,6 +94,7 @@ const sampleListings = [
     price: 2800,
     location: "Shillong, Meghalaya",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -105,6 +111,7 @@ const sampleListings = [
     price: 2100,
     location: "Bangalore, Karnataka",
     country: "India",
+    category: "farms",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -121,6 +128,7 @@ const sampleListings = [
     price: 1500,
     location: "Jaisalmer, Rajasthan",
     country: "India",
+    category: "arctic",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -137,6 +145,7 @@ const sampleListings = [
     price: 3700,
     location: "Alleppey, Kerala",
     country: "India",
+    category: "farms",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -153,6 +162,7 @@ const sampleListings = [
     price: 5500,
     location: "Connaught Place, Delhi",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -169,6 +179,7 @@ const sampleListings = [
     price: 2400,
     location: "Nainital, Uttarakhand",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -185,6 +196,7 @@ const sampleListings = [
     price: 1850,
     location: "Mysore, Karnataka",
     country: "India",
+    category: "cities",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -201,6 +213,7 @@ const sampleListings = [
     price: 2100,
     location: "Wayanad, Kerala",
     country: "India",
+    category: "cities",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -217,6 +230,7 @@ const sampleListings = [
     price: 1200,
     location: "Pune, Maharashtra",
     country: "India",
+    category: "pools",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -233,6 +247,7 @@ const sampleListings = [
     price: 3000,
     location: "Jim Corbett, Uttarakhand",
     country: "India",
+    category: "camping",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -249,6 +264,7 @@ const sampleListings = [
     price: 950,
     location: "Anjuna, Goa",
     country: "India",
+    category: "beach",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -265,6 +281,7 @@ const sampleListings = [
     price: 5000,
     location: "Udaipur, Rajasthan",
     country: "India",
+    category: "cities",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -281,6 +298,7 @@ const sampleListings = [
     price: 2200,
     location: "Hyderabad, Telangana",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -297,6 +315,7 @@ const sampleListings = [
     price: 1750,
     location: "Coonoor, Tamil Nadu",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -313,6 +332,7 @@ const sampleListings = [
     price: 6000,
     location: "Lonavala, Maharashtra",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -329,6 +349,7 @@ const sampleListings = [
     price: 4000,
     location: "Gulmarg, Kashmir",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -345,6 +366,7 @@ const sampleListings = [
     price: 4300,
     location: "Indore, Madhya Pradesh",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -361,6 +383,7 @@ const sampleListings = [
     price: 3400,
     location: "Chennai, Tamil Nadu",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -377,6 +400,7 @@ const sampleListings = [
     price: 5000,
     location: "Andaman and Nicobar Islands",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -393,6 +417,7 @@ const sampleListings = [
     price: 7000,
     location: "Jodhpur, Rajasthan",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -409,6 +434,7 @@ const sampleListings = [
     price: 2700,
     location: "Rishikesh, Uttarakhand",
     country: "Japan",
+    category: "castles",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -425,6 +451,7 @@ const sampleListings = [
     price: 1100,
     location: "Coorg, Karnataka",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -441,6 +468,7 @@ const sampleListings = [
     price: 1300,
     location: "Auroville, Tamil Nadu",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",
@@ -457,6 +485,7 @@ const sampleListings = [
     price: 950,
     location: "Varanasi, Uttar Pradesh",
     country: "India",
+    category: "mountains",
     owner: "67ece7488cfe2def0d963926",
     geometry: {
       type: "Point",

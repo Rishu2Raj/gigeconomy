@@ -10,14 +10,18 @@ router.post('/order/:listingId', wrapAsync(bookingController.booking));
 // POST /bookings/verify
 router.post('/verify', wrapAsync(bookingController.bookingVerify));
 
+router.get('/my', wrapAsync(bookingController.dashboard));
+
+
 // GET /bookings/success
 router.get('/success', (req, res) => {
-    res.render('includes/success.ejs');
+    req.flash("success", "payment successfull!")
+    res.redirect('/bookings/my');
 });
 
 // GET /bookings/failure
 router.get('/failure', (req, res) => {
-    res.render('includes/failure.ejs');
+    res.render('includes/failure');
 });
 
 module.exports = router;

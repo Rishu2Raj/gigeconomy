@@ -1,0 +1,18 @@
+<% layout('/layout/boilerplate') -%>
+
+<div class="container mt-4">
+    <h2>Your Bookings</h2>
+    <% if (bookings.length > 0) { %>
+        <ul class="list-group">
+            <% bookings.forEach(booking => { %>
+                <li class="list-group-item">
+                    <h5><%= booking.listing.title %></h5>
+                    <p>Amount Paid: ₹<%= booking.amount / 100 %></p>
+                    <p>Booked On: <%= booking.bookedAt.toLocaleDateString() %></p>
+                </li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>You haven't booked anything yet!</p>
+    <% } %>
+</div>

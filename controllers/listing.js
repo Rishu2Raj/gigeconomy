@@ -2,8 +2,15 @@ const Listing = require("../models/listing.js");
 const axios = require("axios");
 
 module.exports.index = async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("listings/index.ejs", {allListings});
+    const category = req.query.category || "all";
+    let allListings;
+    if (category === "all") {
+      allListings = await Listing.find({});
+    } else {
+      allListings = await Listing.find({ category });
+    }
+
+    res.render("listings/index.ejs", { allListings, selectedCategory: category });
 };
 
 module.exports.renderNewForm = (req, res) => {    

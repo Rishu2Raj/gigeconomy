@@ -95,7 +95,6 @@
 <script>
     const button = document.getElementById('rzp-btn');
     button.addEventListener('click', async () => {
-        console.log("Book Now button clicked!"); // 👈 debug line
         try {
             const res = await axios.post(`/bookings/order/<%= listing._id %>`);
             const data = res.data;
@@ -104,16 +103,17 @@
                 key: data.key_id,
                 amount: data.amount,
                 currency: data.currency,
-          name: data.listing.title,
-          description: data.listing.description,
-          order_id: data.order_id,
-          handler: async function (response) {
-              try {
-                  const verifyRes = await axios.post('/bookings/verify', {
-                      razorpay_order_id: response.razorpay_order_id,
-                      razorpay_payment_id: response.razorpay_payment_id,
-                      razorpay_signature: response.razorpay_signature,
-                    });
+                name: data.listing.title,
+                description: data.listing.description,
+                order_id: data.order_id,
+                handler: async function (response) {
+                    console.log("Razorpay response:", response);  // 🛠️ Debug log
+                    try {
+                        const verifyRes = await axios.post('/bookings/verify', {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        });
                     
                     if (verifyRes.data.success) {
                         window.location.href = '/bookings/success';
@@ -124,21 +124,25 @@
                     console.error("Verification failed", error);
                     window.location.href = '/bookings/failure';
                 }
-            },
-            prefill: {
+                },
+                prefill: {
                 name: "<%= currUser ? currUser.username : '' %>",
                 email: "<%= currUser ? currUser.email : '' %>"
-            },
-            theme: {
+                },
+                theme: {
                 color: "#3399cc"
-            }
-        };
+                }
+            };
         
-        const rzp = new Razorpay(options);
-        rzp.open();
-    } catch (error) {
-        console.error("Error creating order", error);
-        alert("Error initiating payment.");
-    }
+            const rzp = new Razorpay(options);
+            rzp.open();
+            rzp.on('payment.failed', function (response) {
+                console.error("Payment failed:", response.error); // 🛠️ Failure log
+            });
+
+        } catch (error) {
+            console.error("Error creating order", error);
+            alert("Error initiating payment.");
+        }
 });
 </script>
