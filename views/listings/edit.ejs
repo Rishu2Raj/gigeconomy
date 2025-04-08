@@ -14,6 +14,21 @@
                     <div class="invalid-feedback">Description should be valid!</div>
                 </div>
                 <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" name="listing[category]" required>
+                      <option value="">Select Listings Category</option>
+                      <option value="mountains" <%= listing.category === "mountains" ? "selected" : "" %>>Mountains</option>
+                      <option value="castles" <%= listing.category === "castles" ? "selected" : "" %>>Castles</option>
+                      <option value="beach" <%= listing.category === "beach" ? "selected" : "" %>>Beach</option>
+                      <option value="cities" <%= listing.category === "cities" ? "selected" : "" %>>Cities</option>
+                      <option value="rooms" <%= listing.category === "rooms" ? "selected" : "" %>>Rooms</option>
+                      <option value="arctic" <%= listing.category === "arctic" ? "selected" : "" %>>Arctic</option>
+                      <option value="pools" <%= listing.category === "pools" ? "selected" : "" %>>Pools</option>
+                      <option value="pools" <%= listing.category === "camping" ? "selected" : "" %>>Camping</option>
+                      <option value="pools" <%= listing.category === "farms" ? "selected" : "" %>>farms</option>
+                    </select>
+                  </div>                  
+                <div class="mb-3">
                     <p>Original Image Preview</p>
                     <img src="<%= originalImageUrl %>"/>
                 </div>

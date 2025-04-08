@@ -34,7 +34,8 @@ const listingSchema = new Schema({
 
     category: {
         type: String,
-        enum: ["rooms", "cities", "castles", "pools", "camping", "farms", "mountains", "arctic", "beach"]
+        enum: ["rooms", "cities", "castles", "pools", "camping", "farms", "mountains", "arctic", "beach"],
+        required: true,
     },
 
     owner: {
