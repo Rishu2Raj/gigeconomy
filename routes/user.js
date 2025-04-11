@@ -22,4 +22,12 @@ router
 
 router.get("/logout", userController.logout);
 
+router.get("/privacy", async (req, res) => {
+    res.render("includes/privacy.ejs");
+})
+
+router.get("/terms", async (req, res) => {
+    res.render("includes/terms.ejs");
+})
+
 module.exports = router;

@@ -44,14 +44,15 @@ footer {
     flex-wrap: wrap;
 }
 
-.f-info-socials i {
+.f-info-socials a {
     font-size: 24px;
     margin: 0 10px;
     transition: color 0.3s ease-in-out;
     cursor: pointer;
+    text-decoration: none;
 }
 
-.f-info-socials i:hover {
+.f-info-socials a:hover {
     color: #fbbc05; /* Change color on hover */
 }
 
