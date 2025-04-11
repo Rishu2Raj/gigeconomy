@@ -1,27 +1,17 @@
 const express = require("express");
 const router = express.Router();
+const { isLoggedIn } = require("../middleware");
+const bookingController =  require("../controllers/booking.js");
 const wrapAsync = require("../utils/wrapAsync.js");
-const bookingController = require("../controllers/booking.js");
-const {isLoggedIn} = require("../middleware.js");
 
-// POST /bookings/order/:listingId
-router.post('/order/:listingId', wrapAsync(bookingController.booking));
+router.post("/create-order", isLoggedIn, wrapAsync(bookingController.createOrder));
 
-// POST /bookings/verify
-router.post('/verify', wrapAsync(bookingController.bookingVerify));
-
-router.get('/my', wrapAsync(bookingController.dashboard));
+router.get('/confirm', wrapAsync(bookingController.confirmOrder));
 
 
-// GET /bookings/success
-router.get('/success', (req, res) => {
-    req.flash("success", "payment successfull!")
-    res.render('bookings/dashboard.ejs');
-});
+// Show bookings dashboard
+router.get("/", isLoggedIn, wrapAsync(bookingController.dashboard));
 
-// GET /bookings/failure
-router.get('/failure', (req, res) => {
-    res.render('bookings/dashboard.ejs');
-});
+router.delete("/:id", isLoggedIn, wrapAsync(bookingController.cancelBooking));
 
 module.exports = router;

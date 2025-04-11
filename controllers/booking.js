@@ -1,116 +1,54 @@
-const Listing = require('../models/listing');
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
 const Booking = require("../models/booking");
-const nodemailer = require("nodemailer");
-const {sendBookingEmail} = require('../utils/mailer');
+const Razorpay = require("razorpay");
 
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-module.exports.booking = async (req, res) => {
+module.exports.createOrder = async (req, res) => {
     try {
-        const {listingId} = req.params;
-        console.log("listingId:" + listingId);
-        const listing = await Listing.findById(listingId);
-        
-        const options = {
-            amount: listing.price * 100,
-            currency: "INR",
-            receipt: `receipt_order_${Date.now()}`,
-        };
-        
-        const order = await razorpay.orders.create(options);
-        // ✅ Store info in session
-        req.session.listingId = listing._id;
-        req.session.amount = listing.price;
-        
-        res.json({
-            success: true,
-            order_id: order.id,
+        const instance = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID,
-            amount: options.amount,
-            currency: options.currency,
-            listing,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
         });
+        const { amount, listingId } = req.body;
+
+        const options = {
+            amount: amount,
+            currency: "INR",
+            receipt: `receipt_order_${listingId}_${Date.now()}`
+        };
+
+        const order = await instance.orders.create(options);
+        return res.json(order); // ✅ Always return JSON here
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, error: "Order creation failed" });
+        console.error("Razorpay order creation error:", err);
+        return res.status(500).json({ error: "Something went wrong" }); // ✅ Return JSON not plain text
     }
 };
 
 
-module.exports.bookingVerify = async (req, res) => {
-    try {
-        console.log("✅ /verify route hit!");
+module.exports.confirmOrder = async (req, res) => {
+    const { paymentId, orderId, listingId } = req.query;
+    const userId = req.user._id;
 
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const newBooking = new Booking({
+        user: userId,
+        listing: listingId,
+        razorpay_payment_id: paymentId,
+        razorpay_order_id: orderId
+    });
 
-        console.log("Received Razorpay details:", {
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature,
-        });
-
-        // Check if user is logged in
-        if (!req.user) {
-            console.error("❌ User not logged in");
-            return res.status(401).json({ success: false, message: "User not logged in" });
-        }
-
-        // Check if session data exists
-        if (!req.session.listingId || !req.session.amount) {
-            console.error("❌ Missing session data:", req.session);
-            return res.status(400).json({ success: false, message: "Session data missing" });
-        }
-
-        // Signature verification
-        const sign = razorpay_order_id + "|" + razorpay_payment_id;
-        const expectedSignature = crypto
-            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-            .update(sign)
-            .digest("hex");
-
-        if (expectedSignature !== razorpay_signature) {
-            console.error("❌ Signature mismatch");
-            return res.status(400).json({ success: false, message: "Invalid signature" });
-        }
-
-        // Save booking to DB
-        const booking = new Booking({
-            listing: req.session.listingId,
-            user: req.user._id,
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature,
-            amount: req.session.amount,
-            currency: "INR"
-        });
-
-        const savedBooking = await booking.save();
-        console.log("✅ Booking saved successfully:", savedBooking);
-
-        // Send confirmation email (optional error catch)
-        // try {
-        //     await sendBookingEmail(req.user.email, req.user.username, savedBooking);
-        //     console.log("📧 Confirmation email sent to", req.user.email);
-        // } catch (emailError) {
-        //     console.warn("⚠️ Booking saved but email not sent:", emailError.message);
-        // }
-
-        return res.json({ success: true, booking: savedBooking });
-
-    } catch (error) {
-        console.error("❌ Error in bookingVerify:", error);
-        return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
-    }
+    await newBooking.save();
+    req.flash("success", "Booking confirmed successfully!");
+    res.redirect("/bookings"); // or a success page
 };
 
 
 module.exports.dashboard = async (req, res) => {
-    const bookings = await Booking.find({ user: req.user._id }).populate('listing');
-    res.render('bookings/dashboard', { bookings });
+    const bookings = await Booking.find({ user: req.user._id }).populate("listing");
+    res.render("bookings/dashboard", { bookings });
+};
+
+module.exports.cancelBooking = async (req, res) => {
+    await Booking.findByIdAndDelete(req.params.id);
+    req.flash("success", "Booking cancelled successfully!");
+    res.redirect("/bookings");
 };

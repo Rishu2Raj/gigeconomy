@@ -1,26 +1,23 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const bookingSchema = new Schema({
-    listing: {
-        type: Schema.Types.ObjectId,
-        ref: 'Listing',
-        required: true
-    },
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
         required: true
     },
-    razorpay_order_id: String,
+    listing: {
+        type: Schema.Types.ObjectId,
+        ref: "Listing",
+        required: true
+    },
     razorpay_payment_id: String,
-    razorpay_signature: String,
-    amount: Number,
-    currency: String,
+    razorpay_order_id: String,
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+module.exports = mongoose.model("Booking", bookingSchema);

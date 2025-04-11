@@ -1,4 +1,5 @@
 <% layout('/layout/boilerplate') -%>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     let mapToken = "<%= process.env.MAP_TOKEN %>";
     const listing = <%- JSON.stringify(listing) %>;
@@ -18,8 +19,7 @@
                 <p><%= listing.country %></p>
             </p>
         </div>
-        <button id="rzp-btn" type="button" class="btn btn-success"><b>Book Now ₹<%= listing.price %></b></button>
-            
+        <button id="rzp-btn" type="button" class="btn btn-success"><b>Book Now ₹<%= listing.price %></b></button>      
     </div>
     <br>
     <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
@@ -49,7 +49,7 @@
                         <label for="first-rate4" title="Very good">4 stars</label>
                         <input type="radio" id="first-rate5" name="review[rating]" value="5" />
                         <label for="first-rate5" title="Amazing">5 stars</label>
-                      </fieldset>
+                    </fieldset>
                 </div>
                 
                 <div class="mb-3 mt-3">
@@ -89,60 +89,45 @@
 
 <script src="/js/map.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
 <!-- Razorpay Script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-    const button = document.getElementById('rzp-btn');
-    button.addEventListener('click', async () => {
-        try {
-            const res = await axios.post(`/bookings/order/<%= listing._id %>`);
-            const data = res.data;
-            
-            const options = {
-                key: data.key_id,
-                amount: data.amount,
-                currency: data.currency,
-                name: data.listing.title,
-                description: data.listing.description,
-                order_id: data.order_id,
-                handler: async function (response) {
-                    console.log("Razorpay response:", response);  // 🛠️ Debug log
-                    try {
-                        const verifyRes = await axios.post('/bookings/verify', {
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                        });
-                    
-                    if (verifyRes.data.success) {
-                        window.location.href = '/bookings/success';
-                    } else {
-                        window.location.href = '/bookings/failure';
-                    }
-                } catch (error) {
-                    console.error("Verification failed", error);
-                    window.location.href = '/bookings/failure';
-                }
-                },
-                prefill: {
-                name: "<%= currUser ? currUser.username : '' %>",
-                email: "<%= currUser ? currUser.email : '' %>"
-                },
-                theme: {
+    document.getElementById('rzp-btn').onclick = async function (e) {
+        const response = await fetch('/bookings/create-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount: <%= listing.price %> * 100, // Razorpay uses paise
+                listingId: "<%= listing._id %>"
+            }),
+        });
+        const data = await response.json();
+        console.log("Order created from server:", data);
+        var options = {
+            key: "<%= process.env.RAZORPAY_KEY_ID %>", // public key
+            amount: <%= listing.price %> * 100,
+            currency: "INR",
+            name: "<%= listing.title %>",
+            description: "Booking Payment",
+            image: "<%= listing.image.url %>",
+            order_id: data.id,
+            handler: function (response) {
+                alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+                // You can redirect or post this to backend for storing booking
+                window.location.href = `/bookings/confirm?paymentId=${response.razorpay_payment_id}&orderId=${data.id}&listingId=<%= listing._id %>`;
+            },
+            prefill: {
+                name: "<%= currUser?.username || '' %>",
+                email: "<%= currUser?.email || '' %>"
+            },
+            theme: {
                 color: "#3399cc"
-                }
-            };
-        
-            const rzp = new Razorpay(options);
-            rzp.open();
-            rzp.on('payment.failed', function (response) {
-                console.error("Payment failed:", response.error); // 🛠️ Failure log
-            });
-
-        } catch (error) {
-            console.error("Error creating order", error);
-            alert("Error initiating payment.");
-        }
-});
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+        e.preventDefault();
+    }
 </script>
