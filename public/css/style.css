@@ -45,6 +45,7 @@ footer {
 }
 
 .f-info-socials a {
+    color: white;
     font-size: 24px;
     margin: 0 10px;
     transition: color 0.3s ease-in-out;

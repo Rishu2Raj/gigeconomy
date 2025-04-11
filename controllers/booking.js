@@ -94,12 +94,12 @@ module.exports.bookingVerify = async (req, res) => {
         console.log("✅ Booking saved successfully:", savedBooking);
 
         // Send confirmation email (optional error catch)
-        try {
-            await sendBookingEmail(req.user.email, req.user.username, savedBooking);
-            console.log("📧 Confirmation email sent to", req.user.email);
-        } catch (emailError) {
-            console.warn("⚠️ Booking saved but email not sent:", emailError.message);
-        }
+        // try {
+        //     await sendBookingEmail(req.user.email, req.user.username, savedBooking);
+        //     console.log("📧 Confirmation email sent to", req.user.email);
+        // } catch (emailError) {
+        //     console.warn("⚠️ Booking saved but email not sent:", emailError.message);
+        // }
 
         return res.json({ success: true, booking: savedBooking });
 

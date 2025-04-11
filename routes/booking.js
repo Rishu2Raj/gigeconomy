@@ -16,12 +16,12 @@ router.get('/my', wrapAsync(bookingController.dashboard));
 // GET /bookings/success
 router.get('/success', (req, res) => {
     req.flash("success", "payment successfull!")
-    res.redirect('/bookings/my');
+    res.render('bookings/dashboard.ejs');
 });
 
 // GET /bookings/failure
 router.get('/failure', (req, res) => {
-    res.render('includes/failure');
+    res.render('bookings/dashboard.ejs');
 });
 
 module.exports = router;
