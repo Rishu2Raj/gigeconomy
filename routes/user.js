@@ -32,6 +32,6 @@ router.get("/terms", async (req, res) => {
 
 router.get('/search', wrapAsync(userController.search));
 
-router.get("/suggestions", wrapAsync(userController.searchSuggestion));
+router.get("/search/suggestions", wrapAsync(userController.searchSuggestion));
 
 module.exports = router;
