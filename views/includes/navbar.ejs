@@ -2,7 +2,7 @@
   .search-btn {
     background-color: #fe424d;
     color: #fff;
-    border-radius: 25px;
+    border-radius: 0px 10px 10px 0px;
     padding: 0 1rem;
     display: flex;
     align-items: center;
@@ -18,10 +18,10 @@
   }
 
   .search-inp {
-    border-radius: 25px;
+    border-radius: 10px 0px 0px 10px;
     padding: 0.5rem 1rem;
     font-size: 1rem;
-    width: 300px;
+    width: 250px;
   }
 
   #suggestionsList {
@@ -40,57 +40,70 @@
     .search-inp {
       width: 180px;
     }
+
+    .search-btn {
+      padding: 0 0.8rem;
+    }
   }
 </style>
 
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
   <div class="container-fluid">
-    <!-- Brand -->
+    <!-- Left side brand -->
     <a class="navbar-brand" href="/listings?category=all">
       <i class="fa-regular fa-compass"></i>
     </a>
 
-    <!-- Centered Search Bar -->
-    <form class="d-flex mx-auto position-relative" method="GET" action="/search" autocomplete="off" role="search">
-      <div class="position-relative">
-        <input class="form-control search-inp me-2" id="searchInput" type="search" name="q" placeholder="Search Destination..." aria-label="Search">
-        <ul class="list-group position-absolute w-100 shadow-sm" id="suggestionsList" style="display: none;"></ul>
-      </div>
-      <button class="btn search-btn" type="submit">
-        <i class="fa-solid fa-magnifying-glass"></i> Search
-      </button>
-    </form>
+    
 
-    <!-- Toggler -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+    <!-- Toggler Button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Collapsible Nav Links -->
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/listings?category=all">All Listings</a></li>
-        <li class="nav-item"><a class="nav-link" href="/listings/new">Airbnb Your Home</a></li>
+    <!-- Right Side Nav Items -->
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 
+      <div class="navbar-nav">
+        <a class="nav-link" href="/listings?category=all">All listings</a>
+      </div>
+
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="/listings/new">Airbnb Your Home</a>
         <% if (!currUser) { %>
-          <li class="nav-item"><a class="nav-link" href="/signup"><b>Sign Up</b></a></li>
-          <li class="nav-item"><a class="nav-link" href="/login"><b>Login</b></a></li>
+          <a class="nav-link" href="/signup"><b>SignUp</b></a>
+          <a class="nav-link" href="/login"><b>Login</b></a>
         <% } else { %>
-          <li class="nav-item"><a class="nav-link" href="/bookings">My Bookings</a></li>
-          <li class="nav-item"><a class="nav-link" href="/logout"><b>Logout</b></a></li>
+          <a class="nav-link" href="/bookings">My Bookings</a>
+          <a class="nav-link" href="/logout"><b>Logout</b></a>
         <% } %>
-      </ul>
+      </div>
+
+      <div class="navbar-nav ms-auto">
+        <!-- Search Bar (ALWAYS visible) -->
+          <form class="d-flex position-relative mx-auto" role="search" method="get" action="/search" autocomplete="off">
+            <div class="position-relative">
+              <input class="form-control search-inp me-2" id="searchInput" type="search" name="q" placeholder="Search Destination" aria-label="Search">
+              <ul class="list-group position-absolute w-100 shadow-sm" id="suggestionsList" style="display: none;"></ul>
+            </div>
+            <button class="btn search-btn" type="submit">
+              <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+          </form>
+      </div>
+
+      
     </div>
   </div>
 </nav>
 
-<!-- Suggestions Script -->
 <script>
   const input = document.getElementById("searchInput");
   const suggestionsList = document.getElementById("suggestionsList");
 
   input.addEventListener("input", async () => {
     const query = input.value.trim();
+
     if (query.length === 0) {
       suggestionsList.style.display = "none";
       return;
@@ -101,6 +114,7 @@
       const suggestions = await res.json();
 
       suggestionsList.innerHTML = "";
+
       if (suggestions.length === 0) {
         suggestionsList.style.display = "none";
         return;
