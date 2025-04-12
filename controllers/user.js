@@ -41,3 +41,53 @@ module.exports.logout = (req, res, next) => {
         res.redirect("/listings");
     })
 };
+
+module.exports.search = async (req, res) => {
+    const query = req.query.q;
+  
+    if (!query) {
+      req.flash("error", "Please enter a destination to search.");
+      return res.redirect("/listings");
+    }
+  
+    const regex = new RegExp(escapeRegex(query), 'i');
+  
+    const allListings = await Listing.find({
+      $or: [
+        { title: regex },
+        { location: regex },
+        { country: regex },
+        { category: regex }
+      ]
+    });
+  
+    if (allListings.length === 0) {
+      req.flash("error", "No matching listings found.");
+    }
+  
+    res.render("listings/index", { allListings });
+};
+
+
+module.exports.searchSuggestion = async (req, res) => {
+    const query = req.query.q;
+    if (!query) return res.json([]);
+    
+    const regex = new RegExp(query, "i");
+    const suggestions = await Listing.find({
+      $or: [
+          { title: regex },
+          { location: regex },
+          { country: regex },
+          { category: regex }
+        ]
+    })
+    .limit(5)
+    .select("title location"); // send only necessary fields
+    
+    res.json(suggestions);
+};
+
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}

@@ -3,7 +3,7 @@
     background-color: #fe424d;
     color: #fff;
     border-radius: 25px;
-    padding: 0 1rem 0 1rem;
+    padding: 0 1rem;
     display: flex;
     align-items: center;
   }
@@ -19,38 +19,113 @@
 
   .search-inp {
     border-radius: 25px;
-    padding: 0.5rem 3rem 0.5rem 3rem;
+    padding: 0.5rem 1rem;
     font-size: 1rem;
+    width: 300px;
+  }
+
+  #suggestionsList {
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 10px;
+    z-index: 999;
+  }
+
+  #suggestionsList li:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .search-inp {
+      width: 180px;
+    }
   }
 </style>
 
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/listings?category=all"><i class="fa-regular fa-compass"></i></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="/listings?category=all">All listings</a>
-        </div>
-        <div class="navbar-nav ms-auto">
-          <form class="d-flex" role="search">
-            <input class="form-control me-2 search-inp" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-          </form>
-        </div>
-          <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="/listings/new">Airbnb Your Home</a>
-            <% if(!currUser) { %>
-              <a class="nav-link" href="/signup"><b>SignUp</b></a>
-              <a class="nav-link" href="/login"><b>Login</b></a>
-              <% } %>
-              <% if(currUser) { %>
-                <a class="nav-link" href="/bookings">My Bookings</a>
-            <a class="nav-link" href="/logout"><b>Logout</b></a>
-          <% } %>
-        </div>
+  <div class="container-fluid">
+    <!-- Brand -->
+    <a class="navbar-brand" href="/listings?category=all">
+      <i class="fa-regular fa-compass"></i>
+    </a>
+
+    <!-- Centered Search Bar -->
+    <form class="d-flex mx-auto position-relative" method="GET" action="/search" autocomplete="off" role="search">
+      <div class="position-relative">
+        <input class="form-control search-inp me-2" id="searchInput" type="search" name="q" placeholder="Search Destination..." aria-label="Search">
+        <ul class="list-group position-absolute w-100 shadow-sm" id="suggestionsList" style="display: none;"></ul>
       </div>
+      <button class="btn search-btn" type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i> Search
+      </button>
+    </form>
+
+    <!-- Toggler -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible Nav Links -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/listings?category=all">All Listings</a></li>
+        <li class="nav-item"><a class="nav-link" href="/listings/new">Airbnb Your Home</a></li>
+
+        <% if (!currUser) { %>
+          <li class="nav-item"><a class="nav-link" href="/signup"><b>Sign Up</b></a></li>
+          <li class="nav-item"><a class="nav-link" href="/login"><b>Login</b></a></li>
+        <% } else { %>
+          <li class="nav-item"><a class="nav-link" href="/bookings">My Bookings</a></li>
+          <li class="nav-item"><a class="nav-link" href="/logout"><b>Logout</b></a></li>
+        <% } %>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
+<!-- Suggestions Script -->
+<script>
+  const input = document.getElementById("searchInput");
+  const suggestionsList = document.getElementById("suggestionsList");
+
+  input.addEventListener("input", async () => {
+    const query = input.value.trim();
+    if (query.length === 0) {
+      suggestionsList.style.display = "none";
+      return;
+    }
+
+    try {
+      const res = await fetch(`/search/suggestions?q=${encodeURIComponent(query)}`);
+      const suggestions = await res.json();
+
+      suggestionsList.innerHTML = "";
+      if (suggestions.length === 0) {
+        suggestionsList.style.display = "none";
+        return;
+      }
+
+      suggestions.forEach(s => {
+        const li = document.createElement("li");
+        li.classList.add("list-group-item", "list-group-item-action");
+        li.textContent = `${s.title} - ${s.location}`;
+        li.addEventListener("click", () => {
+          input.value = s.title;
+          suggestionsList.style.display = "none";
+        });
+        suggestionsList.appendChild(li);
+      });
+
+      suggestionsList.style.display = "block";
+    } catch (err) {
+      console.error("Suggestion fetch failed:", err);
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!suggestionsList.contains(e.target) && e.target !== input) {
+      suggestionsList.style.display = "none";
+    }
+  });
+</script>

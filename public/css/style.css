@@ -15,6 +15,10 @@ body{
     background-color: white;
 }
 
+.navbar-collapse{
+    background-color: white;
+}
+
 .fa-compass{
     color: #fe424d;
     font-size: 2rem;
@@ -168,3 +172,4 @@ footer {
 .mapboxgl-popup {
     max-width: 200px;
 }
+

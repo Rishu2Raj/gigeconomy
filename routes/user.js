@@ -30,4 +30,8 @@ router.get("/terms", async (req, res) => {
     res.render("includes/terms.ejs");
 })
 
+router.get('/search', wrapAsync(userController.search));
+
+router.get("/suggestions", wrapAsync(userController.searchSuggestion));
+
 module.exports = router;

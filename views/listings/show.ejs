@@ -4,92 +4,89 @@
     let mapToken = "<%= process.env.MAP_TOKEN %>";
     const listing = <%- JSON.stringify(listing) %>;
 </script>
-<div class="row mt-3">
-    <div class="col-8 offset-3">
-        <h3> <%= listing.title %></h3>
-    </div>
-    <div class="card col-6 offset-3 show-card listing-card">
-        <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing-image">
-        <div class="card-body">
-            <p class="card-text">
-                <i>Owned by: <%= listing.owner.username %> </i>
-                <p><%= listing.description %></p>
-                <p>&#8377; <%= listing.price.toLocaleString("en-IN") %></p>
-                <p><%= listing.location %></p>
-                <p><%= listing.country %></p>
-            </p>
-        </div>
-        <button id="rzp-btn" type="button" class="btn btn-success"><b>Book Now ₹<%= listing.price %></b></button>      
-    </div>
-    <br>
-    <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
-        <div class="btns">
-            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
-            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-                <button class="btn btn-dark offset-5">Delete</button>
-            </form>
-        </div>
-    <% } %>
-    <div class="col-8 offset-3 mb-3">
-        <% if (currUser) { %>
-            <hr />
-            <h4>Leave a Review</h4>
-            <form method="post" action="/listings/<%= listing._id %>/reviews" class="needs-validation">
-                <div class="mb-3 mt-3">
-                    <label for="rating" class="form-label">Rating</label>
-                    <fieldset class="starability-slot">
-                        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-                        <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                        <label for="first-rate1" title="Terrible">1 star</label>
-                        <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                        <label for="first-rate2" title="Not good">2 stars</label>
-                        <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                        <label for="first-rate3" title="Average">3 stars</label>
-                        <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                        <label for="first-rate4" title="Very good">4 stars</label>
-                        <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                        <label for="first-rate5" title="Amazing">5 stars</label>
-                    </fieldset>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <h3 class="mb-3 text-center text-md-start"><%= listing.title %></h3>
+
+            <div class="card mb-4 listing-card">
+                <img src="<%= listing.image.url %>" class="card-img-top img-fluid show-img" alt="listing-image">
+                <div class="card-body">
+                    <p class="card-text"><i>Owned by: <%= listing.owner.username %></i></p>
+                    <p><%= listing.description %></p>
+                    <p>&#8377; <%= listing.price.toLocaleString("en-IN") %></p>
+                    <p><%= listing.location %>, <%= listing.country %></p>
                 </div>
-                
-                <div class="mb-3 mt-3">
-                    <label for="comment" class="form-label">Comment</label>
-                    <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
-                    <div class="invalid-feedback">Please add some valid comment for review!</div>
+                <button id="rzp-btn" type="button" class="btn btn-success m-3"><b>Book Now ₹<%= listing.price %></b></button>
+            </div>
+
+            <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark mb-2 mb-md-0 col-md-3">Edit</a>
+                    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="col-md-3">
+                        <button class="btn btn-dark w-100">Delete</button>
+                    </form>
                 </div>
-                <button class="btn btn-outline-dark">Submit</button>
-            </form>
-        <% } %>
-        <hr />
-        <% if (listing.reviews.length > 0) { %>
-            <div class="row">
-                <p><b>All Reviews</b></p>
-                <% for( review of listing.reviews ) { %>
-                    <div class="card col-5 mb-3 ms-3">
-                        <div class="card-body">
-                            <h5 class="card-title">@<%= review.author.username %></h5>
-                            <p class="card-text"><%= review.comment %></p>
-                            <p class="starability-result" data-rating="<%= review.rating %>"></p>
+            <% } %>
+
+            <div class="mb-4">
+                <% if (currUser) { %>
+                    <hr />
+                    <h4>Leave a Review</h4>
+                    <form method="post" action="/listings/<%= listing._id %>/reviews" class="needs-validation">
+                        <div class="mb-3 mt-3">
+                            <label for="rating" class="form-label">Rating</label>
+                            <fieldset class="starability-slot">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <input type="radio" id="first-rate<%= i %>" name="review[rating]" value="<%= i %>" />
+                                    <label for="first-rate<%= i %>" title="<%= ['Terrible', 'Not good', 'Average', 'Very good', 'Amazing'][i-1] %>"><%= i %> star<%= i > 1 ? 's' : '' %></label>
+                                <% } %>
+                            </fieldset>
                         </div>
-                        <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
-                            <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-                                <button type="submit" class="btn btn-sm btn-dark">Delete</button>
-                            </form>
-                        <% } %>
-                    </div>
+                        
+                        <div class="mb-3 mt-3">
+                            <label for="comment" class="form-label">Comment</label>
+                            <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
+                            <div class="invalid-feedback">Please add some valid comment for review!</div>
+                        </div>
+                        <button class="btn btn-outline-dark">Submit</button>
+                    </form>
                 <% } %>
             </div>
-        <% } %>
-    </div>
-    <div class="offset-3 col-6 mb-3">
-        <h3>Where you'll be</h3>
-        <div id="map"></div>
+
+            <% if (listing.reviews.length > 0) { %>
+                <hr />
+                <h5>All Reviews</h5>
+                <div class="row">
+                    <% for (review of listing.reviews) { %>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">@<%= review.author.username %></h6>
+                                    <p class="card-text"><%= review.comment %></p>
+                                    <p class="starability-result" data-rating="<%= review.rating %>"></p>
+                                </div>
+                                <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
+                                    <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="m-2">
+                                        <button type="submit" class="btn btn-sm btn-dark">Delete</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+
+            <hr />
+            <h4 class="mb-2">Where you'll be</h4>
+            <div id="map" style="height: 300px; width: 100%;"></div>
+        </div>
     </div>
 </div>
 
 <script src="/js/map.js"></script>
 
-<!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
 <!-- Razorpay Script -->
 <script>
     document.getElementById('rzp-btn').onclick = async function (e) {
@@ -99,14 +96,13 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                amount: <%= listing.price %> * 100, // Razorpay uses paise
+                amount: <%= listing.price %> * 100,
                 listingId: "<%= listing._id %>"
             }),
         });
         const data = await response.json();
-        console.log("Order created from server:", data);
         var options = {
-            key: "<%= process.env.RAZORPAY_KEY_ID %>", // public key
+            key: "<%= process.env.RAZORPAY_KEY_ID %>",
             amount: <%= listing.price %> * 100,
             currency: "INR",
             name: "<%= listing.title %>",
@@ -115,7 +111,6 @@
             order_id: data.id,
             handler: function (response) {
                 alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
-                // You can redirect or post this to backend for storing booking
                 window.location.href = `/bookings/confirm?paymentId=${response.razorpay_payment_id}&orderId=${data.id}&listingId=<%= listing._id %>`;
             },
             prefill: {
